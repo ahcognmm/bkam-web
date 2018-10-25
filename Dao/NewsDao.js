@@ -4,14 +4,10 @@
 
 import {News} from "../Models/news"
 
-export async function getListNew() {
+export async function getListNew(callback: any) {
     let rs
     await News.find((err, listNews) => {
-        if(err){
-            rs = null
-        }else{
-
-        }
+        callback(err, listNews)
     })
 
 }

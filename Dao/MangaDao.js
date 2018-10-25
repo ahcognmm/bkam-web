@@ -8,7 +8,7 @@ import {Manga, Reader} from "../Models/manga"
  * @param manga : json manga include name, author, chap, urls
  * @returns {Promise<void>}
  */
-export async function addManga(manga: any) {
+export async function addManga(manga: any, callback: any) {
     let name = manga.name
     let author = manga.author
     let chap = manga.chap
@@ -25,7 +25,6 @@ export async function addManga(manga: any) {
         updateTime: updateTime
     })
     await mangaR.save(async err => {
-        if (err) return 0
     })
 
     // exist = 1: manga has init
@@ -36,8 +35,7 @@ export async function addManga(manga: any) {
             else {
                 manga.latestChap = chap
                 manga.save(async err => {
-                    if (err) return 0
-                    else return 1
+                    callback(err)
                 })
             }
         })
@@ -50,7 +48,7 @@ export async function addManga(manga: any) {
             review: ""
         })
         await manga.save(async err => {
-            if (err) return 0
+            callback(err)
         })
     }
 }
@@ -59,13 +57,9 @@ export async function addManga(manga: any) {
  * @param manga : manga's name
  * @returns {Promise<void>}
  */
-async function hasManga(manga: string) {
+async function hasManga(manga: string, callback: any) {
     Manga.findOne({name: manga}, async (err, manga) => {
-        if (err) return 0
-        else {
-            if (manga) return 1
-            else return 0
-        }
+        callback(err, manga)
     })
 }
 
@@ -75,9 +69,9 @@ async function hasManga(manga: string) {
  * @param chap
  * @returns {Promise<void>}
  */
-export async function getMangaReader(manga: string, chap: number) {
+export async function getMangaReader(manga: string, chap: number, callback: any) {
     await Reader.findOne({name: manga, chap: chap}, async (err, manga) => {
-        callbackManga(err, manga)
+        callback(err, manga)
     })
 }
 
@@ -85,9 +79,9 @@ export async function getMangaReader(manga: string, chap: number) {
  *
  * @returns {Promise<void>}
  */
-export async function getListManga() {
+export async function getListManga(callback: any) {
     await Manga.find(async (err, listManga) => {
-        callbackManga(err, listManga)
+        callback(err, listManga)
     })
 }
 
@@ -96,22 +90,8 @@ export async function getListManga() {
  * @param manga
  * @returns {Promise<void>}
  */
-export async function getInforManga(manga: string) {
+export async function getInforManga(manga: string, callback: any) {
     await Manga.findOne({name: manga}, async (err, manga) => {
-        callbackManga(err, manga)
+        callback(err, manga)
     })
-}
-
-/**
- * callback function use in that js file
- * @param err
- * @param result
- * @returns {*}
- */
-function callbackManga(err, result) {
-    if (err) {
-        return null
-    } else {
-        return result
-    }
 }
