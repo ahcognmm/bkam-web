@@ -7,18 +7,24 @@ const manga = mongoose.Schema({
     name: String,
     author: String,
     updateTime: String,
-    latestChap:Number,
-    review:String
+    latestChap: Number,
+    review: String,
+    rate: {
+        currentRate: Number,
+        totalRated: Number,
+    }
 })
-const Manga = mongoose.model("Manga",manga)
+const Manga = mongoose.model("Manga", manga)
 
 const mangareader = mongoose.Schema({
     name: String,
     author: String,
     chap: Number,
-    urls:[String],
-    updateTime:String
+    urls: [String],
+    updateTime: String,
+    count: Number,
+    realReading: Number
 })
-const Reader = mongoose.model("Reader",mangareader)
+const Reader = mongoose.model("Reader", mangareader)
 
 export {Manga, Reader}

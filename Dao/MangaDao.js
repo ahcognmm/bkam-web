@@ -13,6 +13,8 @@ export async function addManga(manga: any, callback: any) {
     let author = manga.author
     let chap = manga.chap
     let urls = manga.urls
+    let count = 0
+    let realReading = 0
     let updateTime = (new Date()).toJSON().slice(0, 10).replace(/[-T]/g, ':')
 
     let exist = await hasManga(name)
@@ -22,7 +24,9 @@ export async function addManga(manga: any, callback: any) {
         author: author,
         chap: chap,
         urls: urls,
-        updateTime: updateTime
+        updateTime: updateTime,
+        count: count,
+        realReading: realReading
     })
     await mangaR.save(async err => {
     })
@@ -64,7 +68,7 @@ async function hasManga(manga: string, callback: any) {
 }
 
 /**
- *
+ *get manga by name and chap
  * @param manga
  * @param chap
  * @returns {Promise<void>}
@@ -87,11 +91,68 @@ export async function getListManga(callback: any) {
 
 /**
  *
- * @param manga
+ * @param manga : name of manga
  * @returns {Promise<void>}
  */
 export async function getInforManga(manga: string, callback: any) {
     await Manga.findOne({name: manga}, async (err, manga) => {
         callback(err, manga)
     })
+}
+
+/**
+ *
+ * @param manga
+ * @param chap
+ * @param callback
+ * @returns {Promise<void>}
+ */
+export async function addMangaCount(manga: string, chap: number, real: boolean, callback: any) {
+    await getMangaReader(manga, chap, (err, manga) => {
+        if (err) {
+            callback(err)
+        } else {
+            let number = manga.count + 1
+            manga.count = number
+            if (real) {
+                let number2 = manga.realReading + 1
+                manga.realReading = number2
+            }
+            manga.save(err => {
+                callback(err)
+            })
+        }
+    })
+
+}
+
+/**
+ * change rate
+ * @param manga
+ * @param callback
+ * @returns {Promise<void>}
+ */
+export async function addRateDao(manga: string, newRate: number, callback: any) {
+    Manga.findOne({name: manga}, (err, manga) => {
+        if (err) {
+            callback(err)
+        } else {
+            let number = manga.rate.totalRated + 1
+            manga.rate.totalRated = number
+            manga.rate.currentRate = newRate
+            manga.save(err => {
+                callback(err)
+            })
+        }
+    })
+}
+
+/**
+ * get manga by object Id
+ * @param id
+ * @param callback
+ * @returns {Promise<void>}
+ */
+export async function getMangaReaderById(id: string, callback: any) {
+    Reader.findOne({_id: Object(id)}, callback)
 }
